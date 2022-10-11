@@ -34,7 +34,7 @@ impl Debug for Rbatis {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Rbatis")
             .field("pool", &self.pool)
-            .field("sql_intercepts", &self.sql_intercepts)
+            .field("sql_intercepts", &self.sql_intercepts.len())
             .finish()
     }
 }
@@ -46,7 +46,6 @@ impl Default for Rbatis {
 }
 
 ///Rbatis Options
-#[derive(Debug)]
 pub struct RbatisOption {
     /// sql intercept vec chain
     pub sql_intercepts: Vec<Box<dyn SqlIntercept>>,
@@ -157,16 +156,14 @@ impl Rbatis {
     ///
     /// can set option for example:
     /// ```rust
-    /// let rbatis = rbatis::Rbatis::new();
-    /// // rbatis.link(**).await;
-    /// // rbatis.get_pool().unwrap().set_max_open_conns()
+    /// use rbatis::Rbatis;
+    /// let rb = Rbatis::new();
+    /// //rb.init(rbdc_sqlite::driver::SqliteDriver {},"sqlite://target/sqlite.db");
+    /// //rb.get_pool().unwrap().resize(10);
     /// ```
     pub fn get_pool(&self) -> Result<&Pool, Error> {
-        let p = self.pool.get();
-        if p.is_none() {
-            return Err(Error::from("[rbatis] rbatis pool not inited!"));
-        }
-        return Ok(p.unwrap());
+        let p = self.pool.get().ok_or_else(||Error::from("[rbatis] rbatis pool not inited!"))?;
+        return Ok(p);
     }
 
     /// get driver type

@@ -1,14 +1,10 @@
 use crate::rbatis::Rbatis;
 use crate::Error;
 use rbs::Value;
-use std::fmt::{Debug, Display};
+use std::fmt::Display;
 
 /// sql intercept
-pub trait SqlIntercept: Send + Sync + Debug {
-    ///the name
-    fn name(&self) -> &str {
-        std::any::type_name::<Self>()
-    }
+pub trait SqlIntercept: Send + Sync {
     /// do intercept sql/args
     /// is_prepared_sql: if is run in prepared_sql=ture
     fn do_intercept(
